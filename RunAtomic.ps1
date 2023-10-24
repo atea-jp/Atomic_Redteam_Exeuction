@@ -16,17 +16,18 @@ if (-not (Test-Path $csvFilePath -PathType Leaf)) {
 # Read the CSV file
 $csvData = Get-Content $csvFilePath
 
-# Create a folder to store the logs
-$LogsFolder = "C:\Temp\$ID-$Test-logs"
-New-Item -ItemType Directory -Path $LogsFolder
-$EventLogPath = "$LogsFolder\EventLogs"
-New-Item -ItemType Directory -Path $EventLogPath
 
 
 # Process each line in the CSV file
 foreach ($line in $csvData) {
     $ID, $Test = $line -split ',', 2
     $Test = $Test.Trim()
+
+    # Create a folder to store the logs
+    $LogsFolder = "C:\Temp\$ID-$Test-logs"
+    New-Item -ItemType Directory -Path $LogsFolder
+    $EventLogPath = "$LogsFolder\EventLogs"
+    New-Item -ItemType Directory -Path $EventLogPath
 
     # Output the $ID and $Test values
     Write-Host "ID: $ID"
