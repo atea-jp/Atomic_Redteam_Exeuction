@@ -12,7 +12,7 @@ New-Item -ItemType Directory -Path $LogsFolder
 Invoke-AtomicTest $ID -CheckPrereqs
 
 # Invoke-AtomicTest with -GetPrereqqs
-Invoke-AtomicTest $ID -GetPrereqqs
+Invoke-AtomicTest $ID -GetPrereqs
 
 # Construct the execution log path
 $ExecutionLogPath = "$LogsFolder\AR_ExecLog_${ID}_${Test}.csv"
@@ -20,13 +20,11 @@ $ExecutionLogPath = "$LogsFolder\AR_ExecLog_${ID}_${Test}.csv"
 # Invoke-AtomicTest with -TestNumbers and -ExecutionLogPath
 Invoke-AtomicTest $ID -TestNumbers $Test -ExecutionLogPath $ExecutionLogPath
 
-# Export Windows Event logs to EVTX format
-$EventLogPath = "$LogsFolder\AR_EventLogs_${ID}_${Test}.evtx"
 
-Get-WinEvent -ListLog * | Select-Object LogName, LogFilePath | ForEach-Object {
-    $name = $_.LogName
-    $safeName = $name.Replace("/", "-")
-    wevtutil.exe EPL $name $EventLogPath
+# Exporting Logs to CSV file.
+Get-winEvent -ListLog * | select LogName | ForEach-Object {
+    $EventLogName = $_.LogName
+    Get-EventLog -LogName $EventLogName | Export-csv $LogsFolder\$EventLogName.csv
 }
 
 # Output the path to the event logs
