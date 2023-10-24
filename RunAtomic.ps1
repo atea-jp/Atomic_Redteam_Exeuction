@@ -1,7 +1,3 @@
-
-#Supressing Warnings and Errors:
-$ErrorActionPreference = 'SilentlyContinue'
-
 # Prompt the user for the ID (string)
 $ID = Read-Host "Enter the ID (string)"
 
@@ -11,6 +7,8 @@ $Test = Read-Host "Enter the Test (comma-separated numerical values)"
 # Create a folder to store the logs
 $LogsFolder = "C:\Temp\$ID-$Test-logs"
 New-Item -ItemType Directory -Path $LogsFolder
+$EventLogPath = $LogsFolder\'EventLogs'
+New-Item -ItemType Directory -Path $EventLogPath
 
 # Invoke-AtomicTest with -CheckPrereqs
 Invoke-AtomicTest $ID -CheckPrereqs
@@ -19,23 +17,27 @@ Invoke-AtomicTest $ID -CheckPrereqs
 Invoke-AtomicTest $ID -GetPrereqs
 
 # Construct the execution log path
-$ExecutionLogPath = "$LogsFolder\AR_ExecLog_${ID}_${Test}.csv"
+$ExecutionLogPath = "$LogsFolder\Atomic_Red_Team_Execution_Log_MITRE_${ID}_TEST_${Test}.csv"
 
 # Invoke-AtomicTest with -TestNumbers and -ExecutionLogPath
 Invoke-AtomicTest $ID -TestNumbers $Test -ExecutionLogPath $ExecutionLogPath
 
 
 # Exporting Logs to CSV file.
-Get-winEvent -ListLog * | select LogName | ForEach-Object {
-    $EventLogName = $_.LogName
-    Get-EventLog -LogName $EventLogName | Export-csv $LogsFolder\$EventLogName.csv
+Get-WinEvent -ListLog * | select LogName, RecordCount | ForEach-Object {
+    if ($_.RecordCount -gt 0) {
+            $EventLogName = $_.LogName
+            $SafeLogName = $EventLogName.Replace("/", "-")
+            Get-WinEvent -LogName $EventLogName | Export-csv $LogsFolder\$SafeLogName.csv
+    }
+
 }
 
 # Output the path to the event logs
 Write-Host "Windows Event logs exported to $EventLogPath"
 
 # Zip the logs folder
-$LogsZipFile = "C:\Temp\$ID_$Test_logs.zip"
+$LogsZipFile = "C:\Temp\${ID}_${Test}_logs.zip"
 Compress-Archive -Path $LogsFolder -DestinationPath $LogsZipFile -Force
 
 # Output the path to the zip file
