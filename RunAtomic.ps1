@@ -33,10 +33,10 @@ foreach ($line in $csvData) {
     Write-Host "ID: $ID"
     Write-Host "Test: $Test"
     # Invoke-AtomicTest with -CheckPrereqs
-    Invoke-AtomicTest $ID -CheckPrereqs
+    Invoke-AtomicTest $ID -TestNumbers $Test -CheckPrereqs
 
     # Invoke-AtomicTest with -GetPrereqqs
-    Invoke-AtomicTest $ID -GetPrereqs
+    Invoke-AtomicTest $ID -TestNumbers $Test -GetPrereqs
 
     # Construct the execution log path
     $ExecutionLogPath = "$LogsFolder\Atomic_Red_Team_Execution_Log_MITRE_${ID}_TEST_${Test}.csv"
