@@ -7,7 +7,7 @@ $Test = Read-Host "Enter the Test (comma-separated numerical values)"
 # Create a folder to store the logs
 $LogsFolder = "C:\Temp\$ID-$Test-logs"
 New-Item -ItemType Directory -Path $LogsFolder
-$EventLogPath = $LogsFolder\'EventLogs'
+$EventLogPath = "$LogsFolder\EventLogs"
 New-Item -ItemType Directory -Path $EventLogPath
 
 # Invoke-AtomicTest with -CheckPrereqs
@@ -28,8 +28,8 @@ Get-WinEvent -ListLog * | select LogName, RecordCount | ForEach-Object {
     if ($_.RecordCount -gt 0) {
             $EventLogName = $_.LogName
             $SafeLogName = $EventLogName.Replace("/", "-")
-            Get-WinEvent -LogName $EventLogName | Export-csv $LogsFolder\$SafeLogName.csv
-            Clear-EventLog -LogName $EventLogName
+            Get-WinEvent -LogName $EventLogName | Export-csv $LogsFolder\$EventLogPath\$SafeLogName.csv
+            Wevtutil cl $EventLogName
     }
 
 }
