@@ -29,6 +29,7 @@ Get-WinEvent -ListLog * | select LogName, RecordCount | ForEach-Object {
             $EventLogName = $_.LogName
             $SafeLogName = $EventLogName.Replace("/", "-")
             Get-WinEvent -LogName $EventLogName | Export-csv $LogsFolder\$SafeLogName.csv
+            Clear-EventLog -LogName $EventLogName
     }
 
 }
@@ -45,8 +46,3 @@ Write-Host "Logs zipped to $LogsZipFile"
 
 # Clean up the environment
 Invoke-AtomicTest $ID -TestNumbers $Test -Cleanup
-
-# Clear all Windows Event logs
-wevtutil el | ForEach-Object { wevtutil cl "$_" }
-
-
