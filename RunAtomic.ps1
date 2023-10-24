@@ -1,3 +1,7 @@
+
+#Supressing Warnings and Errors:
+$ErrorActionPreference = 'SilentlyContinue'
+
 # Prompt the user for the ID (string)
 $ID = Read-Host "Enter the ID (string)"
 
